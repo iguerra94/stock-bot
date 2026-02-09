@@ -33,14 +33,22 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Validate required secrets
+        run: |
+          if [ -z "${AWS_ROLE_ARN}" ] || [ -z "${AWS_REGION}" ]; then
+            echo "Missing required secrets: AWS_ROLE_ARN and/or AWS_REGION"
+            exit 1
+          fi
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: stock-bot-deploy
 
       - name: Install Serverless Framework
-        run: yarn global add serverless@4
+        run: yarn global add serverless@4.5.0
 
       - name: Deploy
         run: serverless deploy --stage ${SLS_STAGE}
