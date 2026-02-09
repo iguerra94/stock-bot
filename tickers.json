@@ -1,0 +1,9 @@
+{
+  "timezone": "America/Argentina/Buenos_Aires",
+  "currency": "USD",
+  "long_term_budget_monthly": 100,
+  "short_term_budget_weekly": 50,
+  "long_term": ["SPYD", "QQQD", "MSFTD.BA"],
+  "short_term": ["NVDA", "NU", "MELI"],
+  "short_term_can_suggest": "strong_only"
+}

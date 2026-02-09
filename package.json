@@ -1,0 +1,19 @@
+{
+  "name": "stock-bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "run:long": "node src/handler.js --job=long",
+    "run:short": "node src/handler.js --job=short",
+    "validate:tickers": "node src/validate-tickers.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "luxon": "^3.5.0",
+    "twilio": "^5.4.0"
+  }
+}
