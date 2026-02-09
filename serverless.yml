@@ -7,6 +7,9 @@ provider:
   runtime: nodejs20.x
   region: ${env:AWS_REGION, "us-east-1"}
   stage: ${env:SLS_STAGE, "prod"}
+  # Use a pre-created execution role to avoid IAM changes during deploys
+  iam:
+    role: ${env:AWS_LAMBDA_ROLE_ARN}
   memorySize: 1024
   timeout: 120
   logRetentionInDays: 30
@@ -17,13 +20,15 @@ functions:
     events:
       - schedule:
           method: scheduler
-          rate: cron(0 17 ? * MON *)
+          roleArn: ${env:AWS_SCHEDULER_ROLE_ARN}
+          rate: cron(0 18 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
             job: long
       - schedule:
           method: scheduler
-          rate: cron(30 17 ? * MON *)
+          roleArn: ${env:AWS_SCHEDULER_ROLE_ARN}
+          rate: cron(30 18 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
             job: short
