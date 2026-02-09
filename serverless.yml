@@ -16,12 +16,12 @@ functions:
     handler: src/lambda.handler
     events:
       - schedule:
-          rate: cron(0 16 ? * MON *)
+          rate: cron(0 17 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
             job: long
       - schedule:
-          rate: cron(0 17 ? * MON *)
+          rate: cron(30 17 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
             job: short
