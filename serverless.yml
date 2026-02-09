@@ -20,14 +20,12 @@ functions:
     events:
       - schedule:
           method: scheduler
-          roleArn: ${env:AWS_SCHEDULER_ROLE_ARN}
           rate: cron(0 18 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
             job: long
       - schedule:
           method: scheduler
-          roleArn: ${env:AWS_SCHEDULER_ROLE_ARN}
           rate: cron(30 18 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
