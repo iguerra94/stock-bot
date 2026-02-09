@@ -17,19 +17,39 @@ provider:
 functions:
   stockBot:
     handler: src/lambda.handler
-    events:
-      - schedule:
-          method: scheduler
-          rate: cron(0 18 ? * MON *)
-          timezone: America/Argentina/Buenos_Aires
-          input:
-            job: long
-      - schedule:
-          method: scheduler
-          rate: cron(30 18 ? * MON *)
-          timezone: America/Argentina/Buenos_Aires
-          input:
-            job: short
+    events: []
+
+resources:
+  Resources:
+    StockBotLongSchedule:
+      Type: AWS::Scheduler::Schedule
+      Properties:
+        Name: ${self:service}-${sls:stage}-long
+        Description: Long job schedule for stock-bot
+        ScheduleExpression: "cron(0 9 ? * TUE *)"
+        ScheduleExpressionTimezone: America/Argentina/Buenos_Aires
+        FlexibleTimeWindow:
+          Mode: OFF
+        State: ENABLED
+        Target:
+          Arn: !GetAtt StockBotLambdaFunction.Arn
+          RoleArn: ${env:AWS_SCHEDULER_ROLE_ARN}
+          Input: "{\"job\":\"long\"}"
+
+    StockBotShortSchedule:
+      Type: AWS::Scheduler::Schedule
+      Properties:
+        Name: ${self:service}-${sls:stage}-short
+        Description: Short job schedule for stock-bot
+        ScheduleExpression: "cron(30 9 ? * TUE *)"
+        ScheduleExpressionTimezone: America/Argentina/Buenos_Aires
+        FlexibleTimeWindow:
+          Mode: OFF
+        State: ENABLED
+        Target:
+          Arn: !GetAtt StockBotLambdaFunction.Arn
+          RoleArn: ${env:AWS_SCHEDULER_ROLE_ARN}
+          Input: "{\"job\":\"short\"}"
 
 package:
   patterns:
