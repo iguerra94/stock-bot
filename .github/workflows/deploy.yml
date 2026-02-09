@@ -3,8 +3,11 @@ name: Deploy
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+  AWS_LAMBDA_ROLE_ARN: ${{ secrets.AWS_LAMBDA_ROLE_ARN }}
+  AWS_SCHEDULER_ROLE_ARN: ${{ secrets.AWS_SCHEDULER_ROLE_ARN }}
   SLS_STAGE: prod
   SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+
 on:
   pull_request:
     branches: [main]
@@ -35,8 +38,8 @@ jobs:
 
       - name: Validate required secrets
         run: |
-          if [ -z "${AWS_ROLE_ARN}" ] || [ -z "${AWS_REGION}" ]; then
-            echo "Missing required secrets: AWS_ROLE_ARN and/or AWS_REGION"
+          if [ -z "${AWS_REGION}" ] || [ -z "${AWS_ROLE_ARN}" ] || [ -z "${AWS_LAMBDA_ROLE_ARN}" ] || [ -z "${AWS_SCHEDULER_ROLE_ARN}" ]; then
+            echo "Missing required secrets: AWS_REGION,AWS_ROLE_ARN, AWS_LAMBDA_ROLE_ARN and AWS_SCHEDULER_ROLE_ARN"
             exit 1
           fi
 
