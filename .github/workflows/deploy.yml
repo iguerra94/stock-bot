@@ -1,5 +1,10 @@
 name: Deploy
 
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+  SLS_STAGE: prod
+  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 on:
   pull_request:
     branches: [main]
@@ -13,11 +18,6 @@ jobs:
   deploy:
     if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-      SLS_STAGE: prod
-      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
     steps:
       - uses: actions/checkout@v4
