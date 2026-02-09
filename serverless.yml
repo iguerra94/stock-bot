@@ -4,7 +4,8 @@ frameworkVersion: "4"
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
+  profile: ${env:AWS_PROFILE, "ivan-admin"}
   region: ${env:AWS_REGION, "us-east-1"}
   stage: ${env:SLS_STAGE, "prod"}
   memorySize: 1024
@@ -16,11 +17,13 @@ functions:
     handler: src/lambda.handler
     events:
       - schedule:
+          method: scheduler
           rate: cron(0 17 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
             job: long
       - schedule:
+          method: scheduler
           rate: cron(30 17 ? * MON *)
           timezone: America/Argentina/Buenos_Aires
           input:
