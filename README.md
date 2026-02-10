@@ -1,8 +1,8 @@
 # Stock Bot (WhatsApp)
 
 Bot semanal en Node.js para enviar dos informes por WhatsApp:
-- **Martes 09:00 (America/Argentina/Buenos_Aires)** → Long Term
-- **Martes 09:30 (America/Argentina/Buenos_Aires)** → Short Term
+- **Martes 19:00 (America/Argentina/Buenos_Aires)** → Long Term
+- **Martes 19:30 (America/Argentina/Buenos_Aires)** → Short Term
 
 ## Requisitos
 - Node.js 20+
@@ -14,7 +14,7 @@ Bot semanal en Node.js para enviar dos informes por WhatsApp:
 
 ## Configuración
 1. Copiar `.env.example` a `.env` y completar variables.
-2. Editar `tickers.json` con tus listas y presupuestos.
+2. Subir `tickers.json` a tu bucket S3 privado y configurar su ubicación por env vars.
 
 Variables de entorno:
 - `MARKETSTACK_API_KEY`
@@ -28,6 +28,8 @@ Variables de entorno:
 - `TWILIO_WHATSAPP_FROM`
 - `WHATSAPP_TO`
 - `WHATSAPP_NAME`
+- `TICKERS_BUCKET`
+- `TICKERS_KEY`
 - `REPORTS_BUCKET`
 - `REPORTS_URL_TTL_SEC` (segundos, ej. `86400`)
 
@@ -60,23 +62,35 @@ Campos requeridos:
 Opcionales:
 - `short_term_can_suggest`: `strong_only` para sugerir nuevos tickers solo con señal fuerte.
 
+### Notas sobre `tickers.json`
+- Se carga desde S3 usando `TICKERS_BUCKET` y `TICKERS_KEY`.
+
 ## Scripts
-- `npm run validate:tickers`
-- `npm run run:long`
-- `npm run run:short`
+- `yarn build` (compila TypeScript a `dist/`)
+- `yarn test` (compila y ejecuta tests con `node --test`)
+- `yarn validate:tickers` (valida símbolos contra Marketstack)
+- `yarn check:tickers` (verifica acceso a `tickers.json` y estructura mínima)
+- `yarn run:long`
+- `yarn run:short`
 
 ## Notas
 - El análisis es informativo, con señales cautelosas.
 - Si un ticker no tiene datos, se reporta y se omite.
 - El bot consulta datos de los últimos 6 meses por ticker (EOD).
 - El reporte completo se guarda en S3 y se comparte con un link firmado que expira.
+- La Lambda necesita permiso `s3:GetObject` sobre `TICKERS_BUCKET`.
 
 ## Despliegue (AWS Lambda + EventBridge)
-- El `serverless.yml` ya define dos schedules (martes 09:00 y 09:30 America/Argentina/Buenos_Aires).
+- El `serverless.yml` ya define dos schedules (martes 19:00 y 19:30 America/Argentina/Buenos_Aires).
 - Deploy como Lambda con runtime Node.js (ver `serverless.yml`).
 - Configurar variables de entorno en Lambda.
 - Roles requeridos en GitHub Secrets:
   - `AWS_ROLE_ARN` (deploy role)
   - `AWS_LAMBDA_ROLE_ARN` (execution role)
   - `AWS_SCHEDULER_ROLE_ARN` (scheduler role)
-- Empaquetar el proyecto con `node_modules`.
+- Otros secrets en GitHub Actions:
+  - `AWS_REGION`
+  - `SERVERLESS_ACCESS_KEY`
+- El workflow de deploy se dispara cuando un PR a `main` es mergeado.
+- El deploy de GitHub Actions corre `yarn test` (que compila y ejecuta los tests) antes de desplegar.
+- El paquete de Lambda usa `dist/` y `node_modules` (ver `serverless.yml`).

@@ -1,4 +1,4 @@
-import { runJob } from "./run-job.js";
+import { runJob } from "@core";
 
 export const handler = async (event) => {
   const job = event?.job;

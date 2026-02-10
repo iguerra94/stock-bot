@@ -1,10 +1,57 @@
 import fs from "node:fs";
 import path from "node:path";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
-export function loadConfig() {
-  const filePath = path.resolve(process.cwd(), "tickers.json");
-  console.log(`[config] loading ${filePath}`);
-  const raw = fs.readFileSync(filePath, "utf-8");
+const s3 = new S3Client({});
+
+function parseBucket(value) {
+  if (!value) return "";
+  if (value.startsWith("arn:aws:s3:::")) {
+    return value.replace("arn:aws:s3:::", "");
+  }
+  return value;
+}
+
+function streamToString(stream) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
+  });
+}
+
+async function readBodyAsString(body) {
+  if (!body) return "";
+  if (typeof body === "string") return body;
+  if (Buffer.isBuffer(body)) return body.toString("utf-8");
+  if (typeof body.transformToString === "function") {
+    return body.transformToString();
+  }
+  return streamToString(body);
+}
+
+async function readConfigFromS3({ bucket, key }) {
+  const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
+  const res = await s3.send(cmd);
+  return readBodyAsString(res.Body);
+}
+
+export async function loadConfig() {
+  const bucketRaw = process.env.TICKERS_BUCKET;
+  const bucket = parseBucket(bucketRaw);
+  const key = process.env.TICKERS_KEY || "tickers.json";
+  let raw = "";
+
+  if (bucket) {
+    console.log(`[config] loading s3://${bucket}/${key}`);
+    raw = await readConfigFromS3({ bucket, key });
+  } else {
+    const filePath = path.resolve(process.cwd(), "tickers.json");
+    console.log(`[config] loading ${filePath}`);
+    raw = fs.readFileSync(filePath, "utf-8");
+  }
+
   const cfg = JSON.parse(raw);
 
   const required = [

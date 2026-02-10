@@ -1,10 +1,8 @@
-import { loadConfig, loadEnv } from "./config.js";
-import { fetchEodSeries } from "./marketstack.js";
-import { computeMetrics } from "./metrics.js";
-import { buildLongTermPrompt, buildShortTermPrompt } from "./prompt.js";
-import { generateWithLLM } from "./llm.js";
-import { sendWhatsAppTemplate } from "./whatsapp.js";
-import { buildReportKey, createPresignedUrl, uploadReport } from "./report-storage.js";
+import { loadConfig, loadEnv } from "@config";
+import { fetchEodSeries } from "@services";
+import { computeMetrics } from "./metrics";
+import { buildLongTermPrompt, buildShortTermPrompt } from "./prompt";
+import { generateWithLLM, sendWhatsAppTemplate, buildReportKey, createPresignedUrl, uploadReport } from "@services";
 
 function summarizeReport(text, maxLen = 200) {
   if (!text) return "Informe generado.";
@@ -24,7 +22,7 @@ export async function runJob(job) {
   }
 
   console.log(`[run] start job=${job}`);
-  const cfg = loadConfig();
+  const cfg = await loadConfig();
   const env = loadEnv();
   console.log("[run] config/env loaded");
 

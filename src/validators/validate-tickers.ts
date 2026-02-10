@@ -1,9 +1,9 @@
 import "dotenv/config";
-import { loadConfig, loadEnv } from "./config.js";
-import { validateSymbol } from "./marketstack.js";
+import { loadConfig, loadEnv } from "@config";
+import { validateSymbol } from "@services";
 
 async function run() {
-  const cfg = loadConfig();
+  const cfg = await loadConfig();
   const env = loadEnv();
   const all = [...new Set([...cfg.long_term, ...cfg.short_term])];
 

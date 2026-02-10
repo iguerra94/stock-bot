@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { runJob } from "./run-job.js";
+import { runJob } from "@core";
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -11,7 +11,7 @@ function parseArgs() {
 async function run() {
   const job = parseArgs();
   if (!job || !["long", "short"].includes(job)) {
-    throw new Error("Usage: node src/handler.js --job=long|short");
+    throw new Error("Usage: node src/handlers/handler --job=long|short");
   }
 
   await runJob(job);
