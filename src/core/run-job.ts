@@ -1,9 +1,20 @@
-import { loadConfig, loadEnv } from "./config.js";
-import { fetchEodSeries } from "./marketstack.js";
-import { computeMetrics } from "./metrics.js";
-import { buildLongTermPrompt, buildShortTermPrompt } from "./prompt.js";
-import { generateWithLLM } from "./llm.js";
-import { sendWhatsApp } from "./whatsapp.js";
+import { loadConfig, loadEnv } from "@config";
+import { fetchEodSeries } from "@services";
+import { computeMetrics } from "./metrics";
+import { buildLongTermPrompt, buildShortTermPrompt } from "./prompt";
+import { generateWithLLM, sendWhatsAppTemplate, buildReportKey, createPresignedUrl, uploadReport } from "@services";
+
+function summarizeReport(text, maxLen = 200) {
+  if (!text) return "Informe generado.";
+  const paragraphs = text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const summary = (paragraphs[0] || text).replace(/\s+/g, " ").trim();
+  if (summary.length <= maxLen) return summary;
+  return `${summary.slice(0, maxLen - 1)}…`;
+}
+
+function formatDateISO(date = new Date()) {
+  return date.toISOString().slice(0, 10);
+}
 
 export async function runJob(job) {
   if (!job || !["long", "short"].includes(job)) {
@@ -11,7 +22,7 @@ export async function runJob(job) {
   }
 
   console.log(`[run] start job=${job}`);
-  const cfg = loadConfig();
+  const cfg = await loadConfig();
   const env = loadEnv();
   console.log("[run] config/env loaded");
 
@@ -58,20 +69,40 @@ export async function runJob(job) {
   });
   console.log("[llm] report ready");
 
-  const header = job === "long"
-    ? "[Long Term] Informe semanal"
-    : "[Short Term] Informe semanal";
-
+  const header = job === "long" ? "[Long Term] Informe semanal" : "[Short Term] Informe semanal";
   const body = `${header}\n\n${analysis}`;
+  const reportDate = formatDateISO();
+  const reportType = job === "long" ? "Long Term" : "Short Term";
+  const summaryText = summarizeReport(analysis);
+  const reportKey = buildReportKey({ job, date: reportDate });
 
   console.log("[whatsapp] sending");
-  await sendWhatsApp({
+  await uploadReport({
+    bucket: env.reportsBucket,
+    key: reportKey,
+    body
+  });
+  const reportUrl = await createPresignedUrl({
+    bucket: env.reportsBucket,
+    key: reportKey,
+    expiresIn: env.reportsUrlTtlSec
+  });
+
+  const msgSid = await sendWhatsAppTemplate({
     accountSid: env.twilioAccountSid,
     authToken: env.twilioAuthToken,
     from: env.twilioFrom,
     to: env.whatsappTo,
-    body
+    contentSid: env.twilioContentSid,
+    contentVariables: {
+      "1": env.whatsappName,
+      "2": reportDate,
+      "3": summaryText,
+      "4": reportUrl,
+      "5": reportType
+    }
   });
+  console.log(`[whatsapp] sid=${msgSid} reportKey=${reportKey} ttl=${env.reportsUrlTtlSec}`);
 
   console.log(`[run] sent. missing=${missing.join(", ") || "none"}`);
 }

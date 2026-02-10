@@ -16,7 +16,7 @@ provider:
 
 functions:
   stockBot:
-    handler: src/lambda.handler
+    handler: dist/handlers/lambda.handler
     events: []
 
 resources:
@@ -26,7 +26,7 @@ resources:
       Properties:
         Name: ${self:service}-${sls:stage}-long
         Description: Long job schedule for stock-bot
-        ScheduleExpression: "cron(0 9 ? * TUE *)"
+        ScheduleExpression: "cron(0 19 ? * TUE *)"
         ScheduleExpressionTimezone: America/Argentina/Buenos_Aires
         FlexibleTimeWindow:
           Mode: OFF
@@ -41,7 +41,7 @@ resources:
       Properties:
         Name: ${self:service}-${sls:stage}-short
         Description: Short job schedule for stock-bot
-        ScheduleExpression: "cron(30 9 ? * TUE *)"
+        ScheduleExpression: "cron(30 19 ? * TUE *)"
         ScheduleExpressionTimezone: America/Argentina/Buenos_Aires
         FlexibleTimeWindow:
           Mode: OFF
@@ -53,7 +53,6 @@ resources:
 
 package:
   patterns:
-    - "src/**"
-    - "tickers.json"
+    - "dist/**"
     - "package.json"
     - "node_modules/**"

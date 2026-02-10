@@ -7,13 +7,23 @@
     "node": ">=20"
   },
   "scripts": {
-    "run:long": "node src/handler.js --job=long",
-    "run:short": "node src/handler.js --job=short",
-    "validate:tickers": "node src/validate-tickers.js"
+    "build": "tsup",
+    "test": "yarn build && node --test $(find src -name \"*.test.js\")",
+    "run:long": "yarn build && node dist/handlers/handler.js --job=long",
+    "run:short": "yarn build && node dist/handlers/handler.js --job=short",
+    "validate:tickers": "yarn build && node dist/validators/validate-tickers.js",
+    "check:tickers": "yarn build && node dist/validators/check-tickers-config.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0",
     "dotenv": "^16.4.5",
     "luxon": "^3.5.0",
-    "twilio": "^5.4.0"
+    "twilio": "^5.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3"
   }
 }
