@@ -1,8 +1,8 @@
 # Stock Bot (WhatsApp)
 
 Bot semanal en Node.js para enviar dos informes por WhatsApp:
-- **Martes 19:00 (America/Argentina/Buenos_Aires)** → Long Term
-- **Martes 19:30 (America/Argentina/Buenos_Aires)** → Short Term
+- **Martes 20:00 (America/Argentina/Buenos_Aires)** → Long Term
+- **Martes 20:30 (America/Argentina/Buenos_Aires)** → Short Term
 
 ## Requisitos
 - Node.js 20+
@@ -81,7 +81,7 @@ Opcionales:
 - La Lambda necesita permiso `s3:GetObject` sobre `TICKERS_BUCKET`.
 
 ## Despliegue (AWS Lambda + EventBridge)
-- El `serverless.yml` ya define dos schedules (martes 19:00 y 19:30 America/Argentina/Buenos_Aires).
+- El `serverless.yml` ya define dos schedules (martes 20:00 y 20:30 America/Argentina/Buenos_Aires).
 - Deploy como Lambda con runtime Node.js (ver `serverless.yml`).
 - Configurar variables de entorno en Lambda.
 - Roles requeridos en GitHub Secrets:
