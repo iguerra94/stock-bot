@@ -66,3 +66,22 @@ export async function sendWhatsApp({
 
   return sids;
 }
+
+export async function sendWhatsAppTemplate({
+  accountSid,
+  authToken,
+  from,
+  to,
+  contentSid,
+  contentVariables
+}) {
+  const client = twilio(accountSid, authToken);
+  const msg = await client.messages.create({
+    from,
+    to,
+    contentSid,
+    contentVariables: JSON.stringify(contentVariables)
+  });
+
+  return msg.sid;
+}

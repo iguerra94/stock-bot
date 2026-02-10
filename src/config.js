@@ -33,6 +33,7 @@ export function loadConfig() {
 export function loadEnv() {
   const env = process.env;
   const required = [
+    "MARKETSTACK_BASE_URL",
     "MARKETSTACK_API_KEY",
     "LLM_BASE_URL",
     "LLM_API_KEY",
@@ -40,7 +41,11 @@ export function loadEnv() {
     "TWILIO_ACCOUNT_SID",
     "TWILIO_AUTH_TOKEN",
     "TWILIO_WHATSAPP_FROM",
-    "WHATSAPP_TO"
+    "WHATSAPP_TO",
+    "TWILIO_WHATSAPP_CONTENT_SID",
+    "REPORTS_BUCKET",
+    "REPORTS_URL_TTL_SEC",
+    "WHATSAPP_NAME"
   ];
 
   for (const key of required) {
@@ -50,15 +55,24 @@ export function loadEnv() {
   }
 
   console.log("[env] ok");
+  const reportsUrlTtlSec = Number.parseInt(env.REPORTS_URL_TTL_SEC, 10);
+  if (!Number.isFinite(reportsUrlTtlSec) || reportsUrlTtlSec <= 0) {
+    throw new Error("REPORTS_URL_TTL_SEC must be a positive integer");
+  }
+
   return {
     marketstackApiKey: env.MARKETSTACK_API_KEY,
-    marketstackBaseUrl: env.MARKETSTACK_BASE_URL || "https://api.marketstack.com/v1",
+    marketstackBaseUrl: env.MARKETSTACK_BASE_URL,
     llmBaseUrl: env.LLM_BASE_URL,
     llmApiKey: env.LLM_API_KEY,
     llmModel: env.LLM_MODEL,
     twilioAccountSid: env.TWILIO_ACCOUNT_SID,
     twilioAuthToken: env.TWILIO_AUTH_TOKEN,
     twilioFrom: env.TWILIO_WHATSAPP_FROM,
-    whatsappTo: env.WHATSAPP_TO
+    whatsappTo: env.WHATSAPP_TO,
+    twilioContentSid: env.TWILIO_WHATSAPP_CONTENT_SID,
+    whatsappName: env.WHATSAPP_NAME,
+    reportsBucket: env.REPORTS_BUCKET,
+    reportsUrlTtlSec
   };
 }

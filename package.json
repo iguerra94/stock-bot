@@ -12,6 +12,8 @@
     "validate:tickers": "node src/validate-tickers.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0",
     "dotenv": "^16.4.5",
     "luxon": "^3.5.0",
     "twilio": "^5.4.0"
