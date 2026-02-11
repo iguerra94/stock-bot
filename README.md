@@ -38,16 +38,13 @@ El envío usa **plantillas aprobadas** para cumplir con la ventana de 24 horas d
 El template recomendado (una sola plantilla) usa estas variables:
 - `{{1}}` nombre
 - `{{2}}` fecha (`YYYY-MM-DD`)
-- `{{3}}` resumen corto
-- `{{4}}` link firmado al reporte completo
-- `{{5}}` tipo (`Long Term` / `Short Term`)
+- `{{3}}` link firmado al reporte completo
+- `{{4}}` tipo (`Long Term` / `Short Term`)
 
 Ejemplo de texto:
 ```
-Hola {{1}}, tu reporte semanal está listo ({{2}}).
-Tipo: {{5}}
-Resumen: {{3}}
-Reporte completo: {{4}}
+Hola {{1}}. Tu reporte {{4}} está listo ({{2}}).
+Reporte completo: {{3}}
 ```
 
 ### Formato de `tickers.json`
