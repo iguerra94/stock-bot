@@ -1,8 +1,8 @@
 # Stock Bot (WhatsApp)
 
 Bot semanal en Node.js para enviar dos informes por WhatsApp:
-- **Martes 20:00 (America/Argentina/Buenos_Aires)** → Long Term
-- **Martes 20:30 (America/Argentina/Buenos_Aires)** → Short Term
+- **Miércoles 11:30 (America/Argentina/Buenos_Aires)** → Long Term
+- **Miércoles 12:00 (America/Argentina/Buenos_Aires)** → Short Term
 
 ## Requisitos
 - Node.js 20+
@@ -38,16 +38,13 @@ El envío usa **plantillas aprobadas** para cumplir con la ventana de 24 horas d
 El template recomendado (una sola plantilla) usa estas variables:
 - `{{1}}` nombre
 - `{{2}}` fecha (`YYYY-MM-DD`)
-- `{{3}}` resumen corto
-- `{{4}}` link firmado al reporte completo
-- `{{5}}` tipo (`Long Term` / `Short Term`)
+- `{{3}}` link firmado al reporte completo
+- `{{4}}` tipo (`Long Term` / `Short Term`)
 
 Ejemplo de texto:
 ```
-Hola {{1}}, tu reporte semanal está listo ({{2}}).
-Tipo: {{5}}
-Resumen: {{3}}
-Reporte completo: {{4}}
+Hola {{1}}. Tu reporte {{4}} está listo ({{2}}).
+Reporte completo: {{3}}
 ```
 
 ### Formato de `tickers.json`
@@ -81,7 +78,7 @@ Opcionales:
 - La Lambda necesita permiso `s3:GetObject` sobre `TICKERS_BUCKET`.
 
 ## Despliegue (AWS Lambda + EventBridge)
-- El `serverless.yml` ya define dos schedules (martes 20:00 y 20:30 America/Argentina/Buenos_Aires).
+- El `serverless.yml` ya define dos schedules (miércoles 11:30 y 12:00 America/Argentina/Buenos_Aires).
 - Deploy como Lambda con runtime Node.js (ver `serverless.yml`).
 - Configurar variables de entorno en Lambda.
 - Roles requeridos en GitHub Secrets:

@@ -4,14 +4,6 @@ import { computeMetrics } from "./metrics";
 import { buildLongTermPrompt, buildShortTermPrompt } from "./prompt";
 import { generateWithLLM, sendWhatsAppTemplate, buildReportKey, createPresignedUrl, uploadReport } from "@services";
 
-function summarizeReport(text, maxLen = 200) {
-  if (!text) return "Informe generado.";
-  const paragraphs = text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-  const summary = (paragraphs[0] || text).replace(/\s+/g, " ").trim();
-  if (summary.length <= maxLen) return summary;
-  return `${summary.slice(0, maxLen - 1)}…`;
-}
-
 function formatDateISO(date = new Date()) {
   return date.toISOString().slice(0, 10);
 }
@@ -73,7 +65,6 @@ export async function runJob(job) {
   const body = `${header}\n\n${analysis}`;
   const reportDate = formatDateISO();
   const reportType = job === "long" ? "Long Term" : "Short Term";
-  const summaryText = summarizeReport(analysis);
   const reportKey = buildReportKey({ job, date: reportDate });
 
   console.log("[whatsapp] sending");
@@ -97,9 +88,8 @@ export async function runJob(job) {
     contentVariables: {
       "1": env.whatsappName,
       "2": reportDate,
-      "3": summaryText,
-      "4": reportUrl,
-      "5": reportType
+      "3": reportUrl,
+      "4": reportType
     }
   });
   console.log(`[whatsapp] sid=${msgSid} reportKey=${reportKey} ttl=${env.reportsUrlTtlSec}`);
