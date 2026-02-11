@@ -4,7 +4,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 const s3 = new S3Client({});
 
 export function buildReportKey({ job, date }) {
-  return `reports/${job}/${date}/report.txt`;
+  return `reports/${job}/${date}/report.md`;
 }
 
 export async function uploadReport({ bucket, key, body }) {
@@ -12,7 +12,7 @@ export async function uploadReport({ bucket, key, body }) {
     Bucket: bucket,
     Key: key,
     Body: body,
-    ContentType: "text/plain; charset=utf-8",
+    ContentType: "text/markdown; charset=utf-8",
     ServerSideEncryption: "AES256"
   });
 

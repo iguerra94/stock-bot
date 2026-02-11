@@ -42,4 +42,30 @@ describe("prompts", () => {
     assert.ok(text.includes("corto/medio plazo"));
     assert.ok(text.includes("Solo sugerir nuevos tickers"));
   });
+
+  it("builds short term prompt with default suggestion rule", () => {
+    const text = buildShortTermPrompt({
+      cfg: { ...cfg, short_term_can_suggest: "any" },
+      summary,
+      missing: []
+    });
+    assert.ok(text.includes("Puedes sugerir nuevos tickers"));
+  });
+
+  it("renders N/A values when summary has invalid numeric fields", () => {
+    const text = buildLongTermPrompt({
+      cfg,
+      summary: [{
+        ticker: "MSFT",
+        lastClose: Number.NaN,
+        weeklyReturn: Number.NaN,
+        threeMonthReturn: Number.NaN,
+        sixMonthReturn: Number.NaN,
+        volatility: Number.NaN,
+        trend: "mixta"
+      }],
+      missing: []
+    });
+    assert.ok(text.includes("N/A"));
+  });
 });
