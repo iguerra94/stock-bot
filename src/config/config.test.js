@@ -50,6 +50,12 @@ describe("config", () => {
     });
   });
 
+  it("loadEnv throws when REPORTS_URL_TTL_SEC is invalid", () => {
+    return withEnv({ ...REQUIRED_ENV, REPORTS_URL_TTL_SEC: "0" }, async () => {
+      assert.throws(() => loadEnv(), /REPORTS_URL_TTL_SEC must be a positive integer/);
+    });
+  });
+
   it("loadConfig reads local tickers.json when TICKERS_BUCKET is empty", async () => {
     const filePath = path.resolve(process.cwd(), "tickers.json");
     const payload = {
@@ -68,6 +74,49 @@ describe("config", () => {
         const cfg = await loadConfig();
         assert.equal(cfg.currency, "USD");
         assert.deepEqual(cfg.long_term, ["AAPL"]);
+      });
+    } finally {
+      fs.unlinkSync(filePath);
+    }
+  });
+
+  it("loadConfig throws when required config key is missing", async () => {
+    const filePath = path.resolve(process.cwd(), "tickers.json");
+    const payload = {
+      timezone: "America/Argentina/Buenos_Aires",
+      currency: "USD",
+      long_term_budget_monthly: 500,
+      short_term_budget_weekly: 200,
+      long_term: ["AAPL"]
+    };
+
+    fs.writeFileSync(filePath, JSON.stringify(payload), "utf-8");
+
+    try {
+      await withEnv({ TICKERS_BUCKET: "" }, async () => {
+        await assert.rejects(() => loadConfig(), /Missing config key: short_term/);
+      });
+    } finally {
+      fs.unlinkSync(filePath);
+    }
+  });
+
+  it("loadConfig throws when long_term or short_term are not arrays", async () => {
+    const filePath = path.resolve(process.cwd(), "tickers.json");
+    const payload = {
+      timezone: "America/Argentina/Buenos_Aires",
+      currency: "USD",
+      long_term_budget_monthly: 500,
+      short_term_budget_weekly: 200,
+      long_term: "AAPL",
+      short_term: ["TSLA"]
+    };
+
+    fs.writeFileSync(filePath, JSON.stringify(payload), "utf-8");
+
+    try {
+      await withEnv({ TICKERS_BUCKET: "" }, async () => {
+        await assert.rejects(() => loadConfig(), /long_term and short_term must be arrays/);
       });
     } finally {
       fs.unlinkSync(filePath);

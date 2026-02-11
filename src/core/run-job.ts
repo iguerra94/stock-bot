@@ -78,6 +78,7 @@ export async function runJob(job) {
     key: reportKey,
     expiresIn: env.reportsUrlTtlSec
   });
+  const shortLink = `[Link](${reportUrl})`;
 
   const msgSid = await sendWhatsAppTemplate({
     accountSid: env.twilioAccountSid,
@@ -88,7 +89,7 @@ export async function runJob(job) {
     contentVariables: {
       "1": env.whatsappName,
       "2": reportDate,
-      "3": reportUrl,
+      "3": shortLink,
       "4": reportType
     }
   });
